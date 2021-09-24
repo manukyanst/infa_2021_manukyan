@@ -2,7 +2,7 @@ import turtle
 turtle.speed(0)
 s=str(input())
 a=20
-digits=[int(d) for d in s]
+digits=[int(d) for d in s] #строка чисел
 
 def jump():
     turtle.penup()
