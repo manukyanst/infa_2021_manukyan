@@ -55,7 +55,7 @@ def panda(x,y,size,scr): #x,y -координаты, size - размер, scr -�
     ellipse(scr, white,(x-1.8*size,y,1.8*size,size),0)
 
 #лапы
-    def b_ell(x,y,a,b,angle,color):
+    def b_ell(x,y,a,b,angle,color):#функция, рисующая эллипсы под любым углом
         lapa=pygame.Surface([a,b],pygame.SRCALPHA, 32)
         lapa=lapa.convert_alpha()
         ellipse(lapa,color,(0,0,a,b),0)
