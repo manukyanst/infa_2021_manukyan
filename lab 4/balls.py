@@ -26,7 +26,7 @@ try_numb = 0
 
 BALL = []
 
-n = 40
+n = 60
 
 
 def new_ball():
@@ -70,6 +70,10 @@ f1 = pygame.font.Font(None, 36)
 text1 = f1.render('Число очков: ', True,
                   (180, 180, 0))
 
+end = pygame.font.Font(None, 100)
+text_end = end.render(' Ура, победа!!! ', True,
+                      (200, 200, 0))
+
 
 while not finished:
     clock.tick(FPS)
@@ -84,22 +88,23 @@ while not finished:
             
 # Проверяет, было ли попадание по какому-то шарику 
             for i in range(n):
-                if  ((BALL[i - 1][0] - a)**2 + (BALL[i - 1][1] - b)**2) < r**2 :
+                if  ((BALL[i - 1][0] - a)**2 + (BALL[i - 1][1] - b)**2) < (BALL[i - 1][2])**2 :
                     BALL[i - 1][2] = 0
                     points+=1
                     print('Счет: ',points, ' Количество попыток: ', try_numb)
-                    
+
+# Отскакивание шарика от стенок              
     for i in range(n):
         if (BALL[i - 1][0] < (A - BALL[i - 1][2]) and  BALL[i - 1][0] > BALL[i - 1][2]):
             BALL[i - 1][0] = BALL[i - 1][0] + BALL[i - 1][4]
         else:
-            BALL[i - 1][4] = randint(-5, 5)
+            BALL[i - 1][4] = - BALL[i - 1][4]
             BALL[i - 1][0] = BALL[i - 1][0] + 2 * BALL[i - 1][4]
             
         if (BALL[i - 1][1] < (B  - BALL[i - 1][2]) and BALL[i - 1][1] > BALL[i - 1][2] + 100):
-            BALL[i - 1][1] = BALL[i -1 ][1] + BALL[i - 1][5]
+            BALL[i - 1][1] = BALL[i -1][1] + BALL[i - 1][5]
         else:
-            BALL[i - 1][5] = randint(-5, 5)
+            BALL[i - 1][5] = - BALL[i - 1][5]
             BALL[i - 1][1] = BALL[i - 1][1] + 2 * BALL[i - 1][5] 
         
 
@@ -114,8 +119,15 @@ while not finished:
 
     for i in range (n):
         move_ball( BALL[i - 1][0], BALL[i - 1][1], BALL[i - 1][2], BALL[i - 1][3])
-    
+
+
     pygame.display.update()
     screen.fill(BLACK)
+
+
+    if (points==n):
+        screen.fill(BLACK)
+        screen.blit(text_end, (300, 400))
+    
 
 pygame.quit()
