@@ -31,6 +31,10 @@ class Ball:
         Args:
         x - начальное положение мяча по горизонтали
         y - начальное положение мяча по вертикали
+        vx - горизонтальная скорость
+        vy - вертикальная скорость
+        color - цвет мяча
+        live - время жизни
         """
         self.screen = screen
         self.x = x
@@ -83,6 +87,15 @@ class Ball:
 
 class Gun:
     def __init__(self, screen):
+        """Конструктор класса Gun
+
+        Args:
+        f2_power - мощность пушки
+        f2_on - значение, обозначающее, в каком режиме пушка
+        an - угол прицеливания
+        color - цвет пушки
+        length - размер пушки
+        """
         self.screen = screen
         self.f2_power = 10
         self.f2_on = 0
@@ -139,6 +152,14 @@ class Gun:
 class Target:
     
     def __init__(self, screen):
+        """Конструктор класса Target
+
+        Args:
+        x - положение цели по горизонтали
+        y - положение цели по вертикали
+        r - радиус цели
+        color - цвет цели
+        """
         self.x = rnd.randint(600, 780)
         self.y = rnd.randint(300, 550)
         self.r = 10
@@ -180,6 +201,7 @@ while not finished:
     gun.draw()
     for b in balls:
         b.draw()
+        b.live -= 0.25
     pygame.display.update()
 
     clock.tick(FPS)
@@ -195,6 +217,8 @@ while not finished:
 
     for b in balls:
         b.move()
+        if b.live == 0:
+            b.r=0
         if b.hittest(target) and target.live:
             target.live = 0
             target.hit()
