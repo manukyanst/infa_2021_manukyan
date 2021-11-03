@@ -3,25 +3,30 @@ from random import choice
 import random as rnd
 
 import pygame
+import sys
+
+FPS = 60
 
 
-FPS = 30
 
-RED = 0xFF0000
-BLUE = 0x0000FF
-YELLOW = 0xFFC91F
-GREEN = 0x00FF00
-MAGENTA = 0xFF03B8
-CYAN = 0x00FFCC
-BLACK = (0, 0, 0)
-WHITE = 0xFFFFFF
-GREY = 0x7D7D7D
-GAME_COLORS = [RED, BLUE, YELLOW, GREEN, MAGENTA, CYAN]
+WIDTH = 1024 
+HEIGHT = 576
+Dr_length = 200
+Dr_high = 120
+ball_size = 45
 
-WIDTH = 800 
-HEIGHT = 600
+ball_pikch = pygame.image.load('шарик.png')
+ball_pikch = pygame.transform.flip(ball_pikch, True, False)
+ball_pikch = pygame.transform.scale(ball_pikch, (ball_size, ball_size))
 
-g = 1
+
+background = pygame.image.load('фон.jpg')
+
+dragon_pikch = pygame.image.load('дракон.png')
+dragon_pikch = pygame.transform.scale(dragon_pikch, (Dr_length, Dr_high ))
+dragon_pikch = pygame.transform.flip(dragon_pikch, True, False)
+
+g = 0.1
 
 
 class Ball:
@@ -39,10 +44,9 @@ class Ball:
         self.screen = screen
         self.x = x
         self.y = y
-        self.r = 10
         self.vx = 0
         self.vy = 0
-        self.color = choice(GAME_COLORS)
+        self.size = ball_size
         self.live = 30
 
     def move(self):
@@ -52,28 +56,33 @@ class Ball:
         self.x и self.y с учетом скоростей self.vx и self.vy, силы гравитации, действующей на мяч,
         и стен по краям окна (размер окна 800х600).
         """
+        angle = - math.atan(self.vy/self.vx)*180/3.14
+        #ball_pikch = pygame.transform.rotate(ball_pikch, angle)
 
-        if (self.x < (WIDTH - self.r)) and (self.x > self.r):
+        if (self.x < (WIDTH - self.size )) and (self.x > self.size ):
             self.x += self.vx
-            self.vx *= 0.95
+            self.vx *= 0.97
         else:
-            self.vx = - self.vx
-            self.x += 2 * self.vx
-        if (self.y < (HEIGHT - self.r)) and (self.y > self.r):
+            self.live = 0
+        if (self.y < (HEIGHT - self.size)) and (self.y > self.size):
             self.y += self.vy
             self.vy += g
-            self.vy *= 0.95
+            self.vy *= 0.99
         else:
-            self.vy = - 0.9 * self.vy
-            self.y += 0.9 * self.vy
+            self.live = 0
+
+    def new_position(self, x, y):
+        """ Функция задает начальные координаты шарика
+            x - координата по горизонтали
+            y - координата по вертикали """
+        self.x = x + Dr_length*0.5
+        self.y = y + 0.5*Dr_high
 
     def draw(self):
-        pygame.draw.circle(
-            self.screen,
-            self.color,
-            (self.x, self.y),
-            self.r
-        )
+        """ Функция прорисовывает шар"""    
+        self.screen.blit(ball_pikch, (self.x, self.y))
+
+
 
     def hittest(self, obj):
         """Функция проверяет сталкивалкивается ли данный обьект с целью, описываемой в обьекте obj.
@@ -85,23 +94,22 @@ class Ball:
         """
         return (((self.x - obj.x)**2 + (self.y - obj.y)**2) < (self.r + obj.r)**2)
 
-class Gun:
+class Dragon:
     def __init__(self, screen):
-        """Конструктор класса Gun
+        """Конструктор класса Dragon
 
         Args:
-        f2_power - мощность пушки
-        f2_on - значение, обозначающее, в каком режиме пушка
+        f2_power - скорость вылета мяча
+        f2_on - значение, обозначающее, в каком режиме дракон
         an - угол прицеливания
-        color - цвет пушки
-        length - размер пушки
         """
+        self.x = 40
+        self.y = 250
         self.screen = screen
-        self.f2_power = 10
+        self.f2_power = 5
         self.f2_on = 0
         self.an = 1
-        self.color = GREY
-        self.length = 10
+        self.speed = 5
 
     def fire2_start(self, event):
         self.f2_on = 1
@@ -115,7 +123,8 @@ class Gun:
         global balls, bullet
         bullet += 1
         new_ball = Ball(self.screen)
-        new_ball.r += 5
+        new_ball.new_position(self.x, self.y)
+        new_ball.size = ball_size
         self.an = - math.atan2((event.pos[1]-new_ball.y), (event.pos[0]-new_ball.x))
         new_ball.vx = self.f2_power * math.cos(self.an)
         new_ball.vy = - self.f2_power * math.sin(self.an)
@@ -124,32 +133,28 @@ class Gun:
         self.f2_power = 10
         
 
-    def targetting(self, event):
-        """Прицеливание. Зависит от положения мыши."""
-        if event:
-            self.an = - math.atan((event.pos[1]-450) / (event.pos[0]-20))
-        if self.f2_on:
-            self.color = RED
-        else:
-            self.color = GREY
+    def move(self, key):
+        if key[pygame.K_d]:
+            self.x += self.speed
+        if key[pygame.K_a]:
+            self.x -= self.speed
+        if key[pygame.K_w]:
+            self.y -= self.speed
+        if key[pygame.K_s]:
+            self.y += self.speed
+            
 
     def draw(self):
-        pygame.draw.polygon(self.screen, self.color, ([40, 450],
-                                                      [40 + self.f2_power * math.cos(self.an), 450 - self.f2_power * math.sin(self.an)],
-                                                      [40 + self.f2_power * math.cos(self.an) + self.length * math.sin(self.an), 450 - self.f2_power * math.sin(self.an) + self.length * math.cos(self.an)],
-                                                      [40 + self.length * math.sin(self.an), 450 + self.length * math.cos(self.an)]))
-        
+        self.screen.blit(dragon_pikch,(self.x, self.y))
+
 
     def power_up(self):
         if self.f2_on:
-            if self.f2_power < 100:
-                self.f2_power += 1
-            self.color = RED
-        else:
-            self.color = GREY
+            if self.f2_power < 40:
+                self.f2_power += 0.001
 
 
-class Target:
+'''class Target:
     
     def __init__(self, screen):
         """Конструктор класса Target
@@ -182,47 +187,51 @@ class Target:
         self.points += points
 
     def draw(self):
-        pygame.draw.circle(self.screen, self.color, (self.x, self.y), self.r)
+        pygame.draw.circle(self.screen, self.color, (self.x, self.y), self.r)'''
 
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
+screen.blit(background, (0,0))
 bullet = 0
 balls = []
 
 clock = pygame.time.Clock()
-gun = Gun(screen)
-target = Target(screen)
+dragon = Dragon(screen)
+#target = Target(screen)
 finished = False
 
 while not finished:
-    screen.fill(WHITE)
-    target.draw()
-    gun.draw()
+    screen.blit(background, (0,0))
+    #target.draw()
+    dragon.draw()
     for b in balls:
         b.draw()
-        b.live -= 0.25
     pygame.display.update()
 
     clock.tick(FPS)
     for event in pygame.event.get():
+        
+        pressed_keys = pygame.key.get_pressed()
+        
         if event.type == pygame.QUIT:
             finished = True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            gun.fire2_start(event)
+            dragon.fire2_start(event)
         elif event.type == pygame.MOUSEBUTTONUP:
-            gun.fire2_end(event)
-        elif event.type == pygame.MOUSEMOTION:
-            gun.targetting(event)
+            dragon.fire2_end(event)
+        if pressed_keys:
+                dragon.move(pressed_keys)
+                
 
     for b in balls:
         b.move()
         if b.live == 0:
-            b.r=0
-        if b.hittest(target) and target.live:
-            target.live = 0
-            target.hit()
-            target.new_target()
-    gun.power_up()
+            b.size = 0
+        #if b.hittest(target) and target.live:
+        #    target.live = 0
+         #   target.hit()
+         #   target.new_target()
+    dragon.power_up()
 
 pygame.quit()
