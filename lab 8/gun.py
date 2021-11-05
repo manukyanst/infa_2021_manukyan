@@ -19,30 +19,30 @@ stone_size = 45
 g = 0.1
 
 
-game_over = pygame.image.load('игра окончена.jpg')
+game_over = pygame.image.load('images\игра окончена.jpg')
 game_over = pygame.transform.scale(game_over, (WIDTH, HEIGHT))
                                    
-stone_pikch = pygame.image.load('камень.png')
+stone_pikch = pygame.image.load('images\камень.png')
 stone_pikch = pygame.transform.scale(stone_pikch, (stone_size, stone_size))
 
-goodtarget_pikch = pygame.image.load('мишень 1.png')
+goodtarget_pikch = pygame.image.load('images\мишень 1.png')
 goodtarget_pikch = pygame.transform.scale(goodtarget_pikch, (target_size, target_size))
 
 
-heart_pikch = pygame.image.load('сердце.png')
+heart_pikch = pygame.image.load('images\сердце.png')
 heart_pikch = pygame.transform.scale(heart_pikch, (heart_size, heart_size))
 
 
 
-ball_pikch = pygame.image.load('шарик.png')
+ball_pikch = pygame.image.load('images\шарик.png')
 ball_pikch = pygame.transform.flip(ball_pikch, True, False)
 ball_pikch = pygame.transform.scale(ball_pikch, (ball_size, ball_size))
 
 
-background = pygame.image.load('фон.jpg')
+background = pygame.image.load('images\фон.jpg')
 background = pygame.transform.scale(background,(WIDTH, HEIGHT))
 
-dragon_pikch = pygame.image.load('дракон.png')
+dragon_pikch = pygame.image.load('images\дракон.png')
 dragon_pikch = pygame.transform.scale(dragon_pikch, (dragon_length, dragon_high ))
 dragon_pikch = pygame.transform.flip(dragon_pikch, True, False)
 
