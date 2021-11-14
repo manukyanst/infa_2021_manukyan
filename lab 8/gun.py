@@ -11,12 +11,13 @@ FPS = 60
 WIDTH = 1300 
 HEIGHT = 650
 dragon_length = 200
-dragon_high = 120
-ball_size = 45
+dragon_high = 120 
+ball_size = 60
 heart_size = 30
 target_size = 60
 stone_size = 45
 g = 0.1
+points = 0
 
 
 game_over = pygame.image.load('images\игра окончена.jpg')
@@ -120,7 +121,7 @@ class Dragon:
         self.speed = 5
         self.length = dragon_length
         self.high = dragon_length
-        self.health = 5
+        self.health = 10
         self.f2_power = 5
         self.f2_on = 0
         self.an = 1
@@ -269,7 +270,7 @@ class Hindrance:
 text = f1.render('Score: ', True,
                   (250, 0, 0))'''
 
-
+name = input('Введите ваше имя: ')
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -327,6 +328,8 @@ while not finished:
         if b.live == 0:
             b.size = 0
         if b.hittest(target) and target.live:
+            points+=1
+            print('Число очков: ', points)
             target.live = 0
             target.hit()
             target.new_target()
@@ -334,3 +337,27 @@ while not finished:
 
 
 pygame.quit()
+
+dict_rating = {}
+
+with open ('results.txt','a') as file:
+    file.write('\n' + str(name) + ' ' + str(points) )
+
+with open ('results.txt','r') as file:
+    for line_row in file:
+        if len(line_row) == 0:
+            continue
+        line = line_row.strip().split()
+        i = []
+        for i in range(len(line)):
+                line[1] = int(line[1])
+        dict_rating.update({line[0]: line[1]})
+        
+        '''import operator
+        sorted_tuple = sorted(dict_rating.items(), key=operator.itemgetter(1))'''
+        
+        sorted_tuple = sorted(dict_rating.items(), key = lambda x: x[1], reverse = True)
+        dict_rating = dict(sorted_tuple)
+
+with open ('results.txt','w') as inf:
+        inf.writelines(str(key)+' '+str(dict_rating[key])+'\n' for key in dict_rating.keys())
